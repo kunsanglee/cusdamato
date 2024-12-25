@@ -55,6 +55,8 @@ allOpen {
     annotation("jakarta.persistence.Entity")
     annotation("jakarta.persistence.MappedSuperclass")
     annotation("jakarta.persistence.Embeddable")
+    annotation("org.springframework.stereotype.Service")
+    annotation("org.springframework.transaction.annotation.Transactional")
 }
 
 tasks.named<Test>("test") {

@@ -4,9 +4,6 @@ import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import server.kotlinpracticaltest.domain.BaseEntity
@@ -17,26 +14,23 @@ import java.time.LocalDateTime
 @Table(name = "orders")
 @Entity
 class Order(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long = 0L,
     @Enumerated(EnumType.STRING)
     var orderStatus: OrderStatus,
     var totalPrice: Int,
     var registeredDateTime: LocalDateTime,
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
-    var orderProducts: MutableList<OrderProduct> = mutableListOf(),
+    var orderProducts: MutableList<OrderProduct> = mutableListOf()
 ) : BaseEntity() {
     companion object {
         fun create(
             products: Collection<Product>,
-            registeredDateTime: LocalDateTime,
+            registeredDateTime: LocalDateTime
         ): Order {
             val order =
                 Order(
                     orderStatus = OrderStatus.INIT,
                     registeredDateTime = registeredDateTime,
-                    totalPrice = calculateTotalPrice(products),
+                    totalPrice = calculateTotalPrice(products)
                 )
             order.orderProducts = createOrderProducts(products, order)
 
@@ -47,12 +41,12 @@ class Order(
 
         private fun createOrderProducts(
             products: Collection<Product>,
-            order: Order,
+            order: Order
         ) = products
             .map {
                 OrderProduct(
                     order = order,
-                    product = it,
+                    product = it
                 )
             }.toMutableList()
     }

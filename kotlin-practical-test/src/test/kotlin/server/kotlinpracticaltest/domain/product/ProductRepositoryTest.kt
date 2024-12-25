@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.tuple
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.ActiveProfiles
 import server.kotlinpracticaltest.domain.product.ProductType.HANDMADE
 import server.kotlinpracticaltest.domain.product.SellingStatus.HOLD
@@ -12,9 +12,10 @@ import server.kotlinpracticaltest.domain.product.SellingStatus.SELLING
 import server.kotlinpracticaltest.domain.product.SellingStatus.STOP_SELLING
 
 @ActiveProfiles("test")
-@SpringBootTest
+// @SpringBootTest
+@DataJpaTest
 class ProductRepositoryTest(
-    @Autowired private val productRepository: ProductRepository,
+    @Autowired private val productRepository: ProductRepository
 ) {
     @Test
     fun `findAllBySellingStatusIn`() {
@@ -24,7 +25,7 @@ class ProductRepositoryTest(
                 type = HANDMADE,
                 sellingStatus = SELLING,
                 name = "아메리카노",
-                price = 4000L,
+                price = 4000L
             )
         val product2 =
             Product(
@@ -32,7 +33,7 @@ class ProductRepositoryTest(
                 type = HANDMADE,
                 sellingStatus = HOLD,
                 name = "카페라떼",
-                price = 4500L,
+                price = 4500L
             )
         val product3 =
             Product(
@@ -40,7 +41,7 @@ class ProductRepositoryTest(
                 type = HANDMADE,
                 sellingStatus = STOP_SELLING,
                 name = "팥빙수",
-                price = 7000L,
+                price = 7000L
             )
 
         productRepository.saveAll(listOf(product1, product2, product3))
@@ -52,7 +53,7 @@ class ProductRepositoryTest(
             .extracting("productNumber", "name", "sellingStatus")
             .containsExactlyInAnyOrder(
                 tuple("001", "아메리카노", SELLING),
-                tuple("002", "카페라떼", HOLD),
+                tuple("002", "카페라떼", HOLD)
             )
     }
 
@@ -64,7 +65,7 @@ class ProductRepositoryTest(
                 type = HANDMADE,
                 sellingStatus = SELLING,
                 name = "아메리카노",
-                price = 4000L,
+                price = 4000L
             )
         val product2 =
             Product(
@@ -72,7 +73,7 @@ class ProductRepositoryTest(
                 type = HANDMADE,
                 sellingStatus = HOLD,
                 name = "카페라떼",
-                price = 4500L,
+                price = 4500L
             )
         val product3 =
             Product(
@@ -80,7 +81,7 @@ class ProductRepositoryTest(
                 type = HANDMADE,
                 sellingStatus = STOP_SELLING,
                 name = "팥빙수",
-                price = 7000L,
+                price = 7000L
             )
 
         productRepository.saveAll(listOf(product1, product2, product3))
@@ -92,7 +93,7 @@ class ProductRepositoryTest(
             .extracting("productNumber", "name", "sellingStatus")
             .containsExactlyInAnyOrder(
                 tuple("001", "아메리카노", SELLING),
-                tuple("003", "팥빙수", STOP_SELLING),
+                tuple("003", "팥빙수", STOP_SELLING)
             )
     }
 }

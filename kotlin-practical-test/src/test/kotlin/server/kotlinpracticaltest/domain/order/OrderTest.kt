@@ -46,13 +46,13 @@ class OrderTest {
     private fun createProduct(
         productNumber: String,
         productType: ProductType,
-        price: Long,
+        price: Long
     ): Product =
         Product(
             productNumber = productNumber,
             type = productType,
             sellingStatus = SELLING,
             name = "메뉴이름",
-            price = price,
+            price = price
         )
 }
