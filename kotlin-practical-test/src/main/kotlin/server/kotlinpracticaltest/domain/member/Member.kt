@@ -1,19 +1,22 @@
 package server.kotlinpracticaltest.domain.member
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToMany
+import jakarta.persistence.Table
 
 @Entity
+@Table(name = "member", indexes = [Index(name = "idx_member", columnList = "id", unique = true)])
 class Member(
     name: String,
 ) {
@@ -25,15 +28,12 @@ class Member(
     var name: String = name
 
     @Embedded
-    @Column(name = "address", nullable = false)
     var homeAddress: Address? = null
         protected set
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "hobby", joinColumns = [JoinColumn(name = "member_id")])
-    @Column(name = "hobby", nullable = false)
-    @Enumerated(EnumType.STRING)
-    var hobbies: MutableCollection<Hobby> = mutableListOf()
+    @OneToMany(fetch = FetchType.LAZY, cascade = [(CascadeType.ALL)], orphanRemoval = true)
+    @JoinColumn(name = "member_id")
+    var hobbies: MutableCollection<HobbyEntity> = mutableListOf()
         protected set
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -42,10 +42,9 @@ class Member(
     var favoriteFoods: MutableSet<String> = mutableSetOf()
         protected set
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "address", joinColumns = [JoinColumn(name = "member_id")])
-    @Column(name = "address", nullable = false)
-    var addressHistory: MutableList<Address> = mutableListOf()
+    @OneToMany(fetch = FetchType.LAZY, cascade = [(CascadeType.ALL)], orphanRemoval = true)
+    @JoinColumn(name = "member_id")
+    var addressHistory: MutableList<AddressEntity> = mutableListOf()
         protected set
 
     fun applyHomeAddress(address: Address) {
