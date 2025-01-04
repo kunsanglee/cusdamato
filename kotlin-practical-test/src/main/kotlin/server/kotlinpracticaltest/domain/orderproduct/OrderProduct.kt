@@ -11,6 +11,7 @@ import server.kotlinpracticaltest.domain.product.Product
 class OrderProduct(
     @ManyToOne(fetch = FetchType.LAZY)
     var order: Order,
+
     @ManyToOne(fetch = FetchType.LAZY)
-    var product: Product
+    var product: Product,
 ) : BaseEntity()

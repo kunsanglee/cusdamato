@@ -18,10 +18,7 @@ class OrderService(
     private val stockRepository: StockRepository,
 ) {
     @Transactional
-    fun createOrder(
-        request: OrderCreateRequest,
-        registeredDateTime: LocalDateTime,
-    ): OrderResponse {
+    fun createOrder(request: OrderCreateRequest, registeredDateTime: LocalDateTime): OrderResponse {
         val productNumbers = request.productNumbers
         val duplicateProducts = findProductsBy(productNumbers)
         val orderProductQuantity = duplicateProducts.groupingBy { it.productNumber }.eachCount()
@@ -29,7 +26,7 @@ class OrderService(
             val stock = (
                 stockRepository.findByProductNumber(productNumber)
                     ?: throw IllegalArgumentException("존재하지 않는 상품번호 입니다. 상품번호: $productNumber")
-            )
+                )
             stock.decreaseQuantity(orderQuantity)
         }
         val createdOrder = Order.create(duplicateProducts, registeredDateTime)

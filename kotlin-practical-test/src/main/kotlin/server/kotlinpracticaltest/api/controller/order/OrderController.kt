@@ -10,13 +10,9 @@ import server.kotlinpracticaltest.api.service.order.response.OrderResponse
 import java.time.LocalDateTime
 
 @RestController
-class OrderController(
-    private val orderService: OrderService
-) {
+class OrderController(private val orderService: OrderService) {
     @PostMapping("api/v1/orders/new")
-    fun createOrder(
-        @RequestBody request: OrderCreateRequest
-    ): ResponseEntity<OrderResponse> {
+    fun createOrder(@RequestBody request: OrderCreateRequest): ResponseEntity<OrderResponse> {
         val registeredDateTime = LocalDateTime.now()
         val orderResponse = orderService.createOrder(request, registeredDateTime)
         return ResponseEntity.ok(orderResponse)

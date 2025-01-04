@@ -16,21 +16,21 @@ import java.time.LocalDateTime
 class Order(
     @Enumerated(EnumType.STRING)
     var orderStatus: OrderStatus,
+
     var totalPrice: Int,
+
     var registeredDateTime: LocalDateTime,
+
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
-    var orderProducts: MutableList<OrderProduct> = mutableListOf()
+    var orderProducts: MutableList<OrderProduct> = mutableListOf(),
 ) : BaseEntity() {
     companion object {
-        fun create(
-            products: Collection<Product>,
-            registeredDateTime: LocalDateTime
-        ): Order {
+        fun create(products: Collection<Product>, registeredDateTime: LocalDateTime): Order {
             val order =
                 Order(
                     orderStatus = OrderStatus.INIT,
                     registeredDateTime = registeredDateTime,
-                    totalPrice = calculateTotalPrice(products)
+                    totalPrice = calculateTotalPrice(products),
                 )
             order.orderProducts = createOrderProducts(products, order)
 
@@ -39,14 +39,11 @@ class Order(
 
         private fun calculateTotalPrice(products: Collection<Product>): Int = products.sumOf { it.price }.toInt()
 
-        private fun createOrderProducts(
-            products: Collection<Product>,
-            order: Order
-        ) = products
+        private fun createOrderProducts(products: Collection<Product>, order: Order) = products
             .map {
                 OrderProduct(
                     order = order,
-                    product = it
+                    product = it,
                 )
             }.toMutableList()
     }
