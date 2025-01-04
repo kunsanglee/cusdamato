@@ -1,6 +1,7 @@
 package server.kotlinpracticaltest.api.service.order
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.tuple
 import org.junit.jupiter.api.AfterEach
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,13 +29,14 @@ class OrderServiceTest(
     @Autowired private val orderRepository: OrderRepository,
     @Autowired private val productRepository: ProductRepository,
     @Autowired private val orderProductRepository: OrderProductRepository,
-    @Autowired private val stockRepository: StockRepository
+    @Autowired private val stockRepository: StockRepository,
 ) {
     @AfterEach
     fun tearDown() {
         orderProductRepository.deleteAllInBatch()
         productRepository.deleteAllInBatch()
         orderRepository.deleteAllInBatch()
+        stockRepository.deleteAllInBatch()
     }
 
     @Test
@@ -59,7 +61,7 @@ class OrderServiceTest(
                 .extracting("productNumber", "price")
                 .containsExactlyInAnyOrder(
                     tuple("001", 4000L),
-                    tuple("002", 4500L)
+                    tuple("002", 4500L),
                 )
         }
     }
@@ -73,8 +75,7 @@ class OrderServiceTest(
 
         val stock1 = Stock.create("001", 2)
         val stock2 = Stock.create("002", 2)
-        val stock3 = Stock.create("003", 1)
-        stockRepository.saveAll(listOf(stock1, stock2, stock3))
+        stockRepository.saveAll(listOf(stock1, stock2))
 
         val request = OrderCreateRequest(listOf("001", "001", "002", "003"))
         val registeredDateTime = LocalDateTime.now()
@@ -93,19 +94,35 @@ class OrderServiceTest(
                     tuple("001", 1000L),
                     tuple("001", 1000L),
                     tuple("002", 3000L),
-                    tuple("003", 5000L)
+                    tuple("003", 5000L),
                 )
         }
 
         val stocks = stockRepository.findAll()
         assertThat(stocks)
-            .hasSize(3)
+            .hasSize(2)
             .extracting("productNumber", "quantity")
             .containsExactlyInAnyOrder(
                 tuple("001", 0),
-                tuple("002", 1),
-                tuple("003", 0)
+                tuple("002", 1)
             )
+    }
+
+    @Test
+    fun `재고 수량보다 많은 양을 주문하면 예외가 발생한다`() {
+        val product1 = createProduct("001", BOTTLE, 1000L)
+        val product2 = createProduct("002", BAKERY, 3000L)
+        val product3 = createProduct("003", HANDMADE, 5000L)
+        productRepository.saveAll(listOf(product1, product2, product3))
+
+        val stock1 = Stock.create("001", 2)
+        val stock2 = Stock.create("002", 2)
+        stockRepository.saveAll(listOf(stock1, stock2))
+
+        val request = OrderCreateRequest(listOf("001", "001", "001", "003"))
+        val registeredDateTime = LocalDateTime.now()
+
+        assertThatCode { orderService.createOrder(request, registeredDateTime) }.isInstanceOf(IllegalStateException::class.java)
     }
 
     @Test
@@ -114,6 +131,10 @@ class OrderServiceTest(
         val product2 = createProduct("002", HANDMADE, 4500L)
         val product3 = createProduct("003", HANDMADE, 7000L)
         productRepository.saveAll(listOf(product1, product2, product3))
+
+        val stock1 = Stock.create("001", 2)
+        val stock2 = Stock.create("002", 2)
+        stockRepository.saveAll(listOf(stock1, stock2))
 
         val request = OrderCreateRequest(listOf("001", "001"))
         val registeredDateTime = LocalDateTime.now()
@@ -130,7 +151,7 @@ class OrderServiceTest(
                 .extracting("productNumber", "price")
                 .containsExactlyInAnyOrder(
                     tuple("001", 4000L),
-                    tuple("001", 4000L)
+                    tuple("001", 4000L),
                 )
         }
     }
@@ -145,6 +166,6 @@ class OrderServiceTest(
             type = productType,
             sellingStatus = SELLING,
             name = "메뉴이름",
-            price = price
+            price = price,
         )
 }

@@ -11,7 +11,7 @@ import server.kotlinpracticaltest.domain.orderproduct.OrderProductRepository
 import server.kotlinpracticaltest.domain.product.Product
 import server.kotlinpracticaltest.domain.product.ProductRepository
 import server.kotlinpracticaltest.domain.product.ProductType
-import server.kotlinpracticaltest.domain.product.ProductType.HANDMADE
+import server.kotlinpracticaltest.domain.product.ProductType.BOTTLE
 import server.kotlinpracticaltest.domain.product.SellingStatus.SELLING
 import server.kotlinpracticaltest.domain.stock.Stock
 import server.kotlinpracticaltest.domain.stock.StockRepository
@@ -37,9 +37,9 @@ class OrderServiceConcurrencyTest(
 
     @Test
     fun `동시성 주문 생성 테스트`() {
-        val product1 = createProduct("001", HANDMADE, 4000L)
-        val product2 = createProduct("002", HANDMADE, 4500L)
-        val product3 = createProduct("003", HANDMADE, 7000L)
+        val product1 = createProduct("001", BOTTLE, 4000L)
+        val product2 = createProduct("002", BOTTLE, 4500L)
+        val product3 = createProduct("003", BOTTLE, 7000L)
         productRepository.saveAll(listOf(product1, product2, product3))
 
         // 초기 재고 설정
@@ -77,9 +77,9 @@ class OrderServiceConcurrencyTest(
 
     @Test
     fun `단일 스레드 주문 생성 테스트`() {
-        val product1 = createProduct("001", HANDMADE, 4000L)
-        val product2 = createProduct("002", HANDMADE, 4500L)
-        val product3 = createProduct("003", HANDMADE, 7000L)
+        val product1 = createProduct("001", BOTTLE, 4000L)
+        val product2 = createProduct("002", BOTTLE, 4500L)
+        val product3 = createProduct("003", BOTTLE, 7000L)
         productRepository.saveAll(listOf(product1, product2, product3))
 
         val productNumber = "001"
@@ -96,11 +96,16 @@ class OrderServiceConcurrencyTest(
         assertThat(finalStock).isEqualTo(expectedStock)
     }
 
-    private fun createProduct(productNumber: String, productType: ProductType, price: Long): Product = Product(
-        productNumber = productNumber,
-        type = productType,
-        sellingStatus = SELLING,
-        name = "메뉴이름",
-        price = price,
-    )
+    private fun createProduct(
+        productNumber: String,
+        productType: ProductType,
+        price: Long
+    ): Product =
+        Product(
+            productNumber = productNumber,
+            type = productType,
+            sellingStatus = SELLING,
+            name = "메뉴이름",
+            price = price,
+        )
 }

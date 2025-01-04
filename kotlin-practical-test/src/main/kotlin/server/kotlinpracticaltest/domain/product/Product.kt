@@ -17,5 +17,5 @@ class Product(
 
     var name: String,
 
-    var price: Long,
+    var price: Long
 ) : BaseEntity()
